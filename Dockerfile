@@ -1,8 +1,12 @@
-# Usamos PHP 8.2 con Apache
-FROM php:8.2-apache
+# Usamos PHP 8.3 con Apache
+FROM php:8.3-apache
 
-# Instalamos extensiones necesarias para Lumen + SQLite
-RUN docker-php-ext-install pdo pdo_sqlite
+# Instalamos dependencias para compilar pdo_sqlite
+RUN apt-get update && apt-get install -y \
+    libsqlite3-dev \
+    && docker-php-ext-install pdo pdo_sqlite \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copiamos todo el proyecto al contenedor
 COPY . /var/www/html/
@@ -10,7 +14,7 @@ COPY . /var/www/html/
 # Establecemos el directorio de trabajo
 WORKDIR /var/www/html
 
-# Ajustamos permisos para almacenamiento y SQLite
+# Ajustamos permisos para storage y base de datos SQLite
 RUN chown -R www-data:www-data storage database \
     && chmod -R 775 storage database
 
