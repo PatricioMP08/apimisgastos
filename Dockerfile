@@ -1,36 +1,40 @@
-# --- Etapa 1: Base PHP ---
-FROM php:8.3-apache
+# 1. Imagen base con PHP 8.3 y extensiones necesarias
+FROM php:8.3-fpm
 
-# Habilitar mod_rewrite para Lumen
-RUN a2enmod rewrite
-
-# Instalar extensiones necesarias (PDO, SQLite, etc.)
+# 2. Instalar dependencias del sistema y extensiones de PHP necesarias
 RUN apt-get update && apt-get install -y \
-    libsqlite3-dev \
-    unzip \
-    git \
-    && docker-php-ext-install pdo pdo_sqlite \
-    && rm -rf /var/lib/apt/lists/*
+        libsqlite3-dev \
+        zip unzip \
+        git \
+        curl \
+        libonig-dev \
+        libxml2-dev \
+        pkg-config \
+        && docker-php-ext-install pdo pdo_sqlite \
+        && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copiar todo el proyecto al contenedor
-COPY . /var/www/html
+# 3. Instalar Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Establecer permisos correctos para storage y bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# 4. Establecer directorio de trabajo
+WORKDIR /var/www/html
 
-# Configurar Apache para servir desde /public
-RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+# 5. Copiar proyecto al contenedor
+COPY . .
 
-# Crear .htaccess en /public para redirigir todas las rutas a index.php
-RUN echo '<IfModule mod_rewrite.c>\n\
-RewriteEngine On\n\
-RewriteCond %{REQUEST_FILENAME} !-f\n\
-RewriteRule ^ index.php [QSA,L]\n\
-</IfModule>' > /var/www/html/public/.htaccess
+# 6. Crear carpetas necesarias y establecer permisos
+RUN mkdir -p storage/framework/cache/data bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-# Exponer puerto 80
-EXPOSE 80
+# 7. Instalar dependencias de PHP
+RUN composer install --no-dev --optimize-autoloader
 
-# Comando para iniciar Apache en primer plano
-CMD ["apache2-foreground"]
+# 8. Establecer usuario www-data
+USER www-data
+
+# 9. Exponer el puerto 8080
+EXPOSE 8080
+
+# 10. Comando por defecto para iniciar Lumen
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
