@@ -1,40 +1,42 @@
-# 1. Imagen base con PHP 8.3 y extensiones necesarias
-FROM php:8.3-fpm
+# --- Etapa 1: Imagen base con PHP y SQLite ---
+FROM php:8.3-cli
 
-# 2. Instalar dependencias del sistema y extensiones de PHP necesarias
+# Instalar extensiones necesarias y utilidades
 RUN apt-get update && apt-get install -y \
-        libsqlite3-dev \
-        zip unzip \
-        git \
-        curl \
-        libonig-dev \
-        libxml2-dev \
-        pkg-config \
-        && docker-php-ext-install pdo pdo_sqlite \
-        && apt-get clean && rm -rf /var/lib/apt/lists/*
+    libsqlite3-dev \
+    zip unzip git \
+    && docker-php-ext-install pdo pdo_sqlite
 
-# 3. Instalar Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# 4. Establecer directorio de trabajo
+# Establecer directorio de trabajo
 WORKDIR /var/www/html
 
-# 5. Copiar proyecto al contenedor
+# Copiar archivos del proyecto al contenedor
 COPY . .
 
-# 6. Crear carpetas necesarias y establecer permisos
-RUN mkdir -p storage/framework/cache/data bootstrap/cache \
+# Crear archivo de base de datos SQLite si no existe
+RUN mkdir -p database \
+    && touch database/database.sqlite
+
+# Dar permisos correctos para storage y bootstrap/cache
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# 7. Instalar dependencias de PHP
-RUN composer install --no-dev --optimize-autoloader
+# Instalar Composer y dependencias PHP
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# 8. Establecer usuario www-data
-USER www-data
+# Establecer variables de entorno
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    APP_KEY=base64:xgkNtNZCFQ6lBoEBI678IjSL5TLufgz8In1JacCw3/g= \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/var/www/html/database/database.sqlite \
+    CACHE_DRIVER=file \
+    QUEUE_CONNECTION=sync
 
-# 9. Exponer el puerto 8080
+# Exponer el puerto que Render usará
 EXPOSE 8080
 
-# 10. Comando por defecto para iniciar Lumen
-CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
+# Iniciar el servidor PHP built-in con el router de Lumen
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "public", "public/index.php"]
