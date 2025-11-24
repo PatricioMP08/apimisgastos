@@ -73,10 +73,10 @@ Asegúrate de que tu archivo `.env` contenga:
 DB_CONNECTION=sqlite
 DB_DATABASE=./database/database.sqlite
 ```
-Inicialización de SQLite
-Para preparar el archivo de base de datos local:
 
-Bash
+
+🛠️ Inicialización de la Base de Datos
+Para preparar el archivo de base de datos local:
 
 mkdir -p database
 touch database/database.sqlite
@@ -85,51 +85,9 @@ chmod 664 database/database.sqlite
 🚀 Instalación y Ejecución
 Sigue estos pasos para levantar el proyecto en tu entorno local.
 
-1. Instalación de Dependencias
-Bash
-
-composer install
-2. Configuración Inicial
-Crea el archivo .env (si no existe) y configúralo para SQLite:
-
-Bash
-
-cp .env.example .env
-Si usas migraciones:
-
-Bash
-
-php artisan migrate
+1. Instalación de Dependencias: composer install
+2. Configuración Inicial: Crea el archivo .env (si no existe) y configúralo para SQLite: cp .env.example .env
+   Si usas migraciones: php artisan migrate
 3. Ejecutar el Servidor
-Utiliza el servidor web embebido de PHP para iniciar la API:
-
-Bash
-
-php -S localhost:8000 -t public
-La API estará accesible en: http://localhost:8000
-
-🧪 Ejemplo de Request
-POST – Crear una nueva transacción
-Request
-HTTP
-
-POST http://localhost:8000/api/transacciones/agregar
-Content-Type: application/json
-
-{
-  "monto": 7500,
-  "categoria": "Transporte",
-  "fecha": "2025-01-20",
-  "descripcion": "Viaje en bus"
-}
-Respuesta Típica
-JSON
-
-{
-  "id": 1,
-  "monto": 7500,
-  "categoria": "Transporte",
-  "fecha": "2025-01-20",
-  "descripcion": "Viaje en bus",
-  "created_at": "2025-01-20T12:34:56Z"
-}
+   La API estará accesible en: http://localhost:8000
+    
