@@ -1,96 +1,117 @@
-🛠️ Backend – API MiGasto (Lumen + SQLite)
+# 🛠️ Backend – API MiGasto (Lumen + SQLite)
 
-Este es el backend del proyecto MiGasto, una API ligera construida con Lumen que gestiona transacciones financieras usando SQLite como base de datos local.
-Su propósito es proporcionar un sistema rápido y simple para almacenar, listar y crear transacciones financieras.
+**MiGasto Backend** es una **API REST** ligera y simple, diseñada para gestionar transacciones financieras de forma rápida. Está construida con **Lumen**, el micro-framework de Laravel, y utiliza **SQLite** para un almacenamiento de datos local y portátil.
 
-📦 Tecnologías utilizadas
+---
 
-Lumen (Laravel Micro-Framework)
-SQLite
-Eloquent ORM
-PHP 8+
-Composer
+## 🎯 Propósito
 
-🗂️ Estructura relevante del proyecto
+El objetivo principal de esta API es proporcionar un sistema sencillo para:
 
-/app
-   /Http
-      /Controllers
-         TransactionController.php   ← Controlador principal
-/database
-   database.sqlite                   ← Archivo SQLite
-/routes
-   web.php                           ← Rutas de la API
+* **Almacenar** transacciones financieras.
+* **Listar** todas las transacciones existentes.
+* **Crear** nuevas entradas mediante un endpoint REST simple.
 
-🧠 Funcionalidad del Backend
+---
 
-El backend se encarga de:
+## 📦 Tecnologías Utilizadas
 
-Almacenar transacciones en SQLite
-Validar datos recibidos desde el frontend
-Exponer endpoints REST simples
-Servir información en formato JSON
-El archivo clave es TransactionController.php, donde se implementan las operaciones principales sobre las transacciones.
+| Tecnología | Descripción |
+| :--- | :--- |
+| **Lumen** | El micro-framework de Laravel, optimizado para APIs rápidas. |
+| **SQLite** | Base de datos ligera, sin servidor, ideal para entornos locales. |
+| **Eloquent ORM** | El ORM de Laravel para una interacción fluida con la base de datos. |
+| **PHP 8+** | El lenguaje de programación principal. |
+| **Composer** | Administrador de dependencias de PHP. |
 
-🧩 Métodos principales en TransactionController.php
-index()
-    Obtiene todas las transacciones desde SQLite
-    Retorna un JSON con toda la lista
-    Puede ordenar las transacciones si se necesita
+---
 
-store()
-    Recibe datos desde el frontend (JSON)
-    Valida monto, categoría, fecha, etc.
-    Crea una nueva transacción con Eloquent
-    Guarda automáticamente en database/database.sqlite
-    Retorna la transacción recién creada
+## 🧠 Estructura y Funcionalidad
 
-🔌 Rutas definidas (en routes/web.php)
-Método	Ruta	                    Acción	    Descripción
-GET	    /api/transacciones	        index()	    Listar todas las transacciones
-POST	/api/transacciones/agregar	store()	    Crear una nueva transacción
+El núcleo del backend reside en el **`TransactionController.php`**, encargado de:
 
-💾 Uso de SQLite
+1.  **Validar** los datos de entrada del frontend.
+2.  **Almacenar** las transacciones en el archivo **`database/database.sqlite`**.
+3.  **Exponer** endpoints REST para las operaciones clave.
+4.  **Servir** la información de las transacciones en formato **JSON**.
 
-Este backend utiliza SQLite como base de datos por su simplicidad y portabilidad.
+### 🗂️ Estructura Relevante del Proyecto
 
-Configuración en .env:
+* `/app/Http/Controllers/TransactionController.php` **← Controlador principal**
+* `/database/database.sqlite` **← Archivo de la base de datos**
+* `/routes/web.php` **← Rutas de la API**
+
+### 📝 Métodos Principales en `TransactionController.php`
+
+| Método | Acción | Descripción |
+| :--- | :--- | :--- |
+| **`index()`** | Listar | Obtiene todas las transacciones desde SQLite y las retorna en JSON. |
+| **`store()`** | Crear | Recibe, valida datos (monto, categoría, fecha, etc.), crea la transacción con Eloquent y la guarda. |
+
+---
+
+## 🔌 Rutas de la API
+
+Las rutas están definidas en `routes/web.php`:
+
+| Método HTTP | Ruta | Acción | Descripción |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/transacciones` | `index()` | Lista todas las transacciones. |
+| **POST** | `/api/transacciones/agregar` | `store()` | Crea una nueva transacción. |
+
+---
+
+## 💾 Uso y Configuración de SQLite
+
+Se utiliza **SQLite** por su simplicidad, portabilidad y la eliminación de un servidor de base de datos externo.
+
+### Configuración de `.env`
+
+Asegúrate de que tu archivo `.env` contenga:
+
+```ini
 DB_CONNECTION=sqlite
 DB_DATABASE=./database/database.sqlite
+Inicialización de SQLite
+Para preparar el archivo de base de datos local:
 
-Crear archivo SQLite:
+Bash
+
 mkdir -p database
 touch database/database.sqlite
 chmod 664 database/database.sqlite
+🚀 Instalación y Ejecución
+Sigue estos pasos para levantar el proyecto en tu entorno local.
 
-🚀 Instalación del proyecto
+1. Instalación de Dependencias
+Bash
 
-Instalar dependencias:
 composer install
+2. Configuración Inicial
+Crea el archivo .env (si no existe) y configúralo para SQLite:
 
-Crear archivo .env:
+Bash
+
 cp .env.example .env
-
-Configurar .env para SQLite.
-
 Si usas migraciones:
+
+Bash
+
 php artisan migrate
+3. Ejecutar el Servidor
+Utiliza el servidor web embebido de PHP para iniciar la API:
 
-▶️ Ejecutar el backend
+Bash
 
-Puedes usar el servidor embebido de PHP:
 php -S localhost:8000 -t public
-
-Acceso a la API:
-
-GET http://localhost:8000/api/transacciones
-POST http://localhost:8000/api/transacciones/agregar
+La API estará accesible en: http://localhost:8000
 
 🧪 Ejemplo de Request
+POST – Crear una nueva transacción
+Request
+HTTP
 
-POST – Crear transacción
-
-POST /api/transacciones/agregar
+POST http://localhost:8000/api/transacciones/agregar
 Content-Type: application/json
 
 {
@@ -99,8 +120,9 @@ Content-Type: application/json
   "fecha": "2025-01-20",
   "descripcion": "Viaje en bus"
 }
+Respuesta Típica
+JSON
 
-📜 Respuesta típica
 {
   "id": 1,
   "monto": 7500,
