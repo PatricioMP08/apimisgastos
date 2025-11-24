@@ -72,14 +72,16 @@ Asegúrate de que tu archivo `.env` contenga:
 ```ini
 DB_CONNECTION=sqlite
 DB_DATABASE=./database/database.sqlite
+```
 Inicialización de SQLite
 Para preparar el archivo de base de datos local:
-```
+
 Bash
 
 mkdir -p database
 touch database/database.sqlite
 chmod 664 database/database.sqlite
+
 🚀 Instalación y Ejecución
 Sigue estos pasos para levantar el proyecto en tu entorno local.
 
