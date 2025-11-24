@@ -74,7 +74,7 @@ DB_CONNECTION=sqlite
 DB_DATABASE=./database/database.sqlite
 Inicialización de SQLite
 Para preparar el archivo de base de datos local:
-
+```
 Bash
 
 mkdir -p database
